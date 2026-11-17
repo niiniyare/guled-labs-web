@@ -1,0 +1,9 @@
+---
+import CatalogPage from '../../components/CatalogPage.astro';
+import { products, type CatalogItem } from '../../data/catalog';
+export function getStaticPaths() {
+  return products.map((item) => ({ params: { slug: item.slug }, props: { item } }));
+}
+const { item } = Astro.props as { item: CatalogItem };
+---
+<CatalogPage item={item} all={products} section="Products" base="/products" />

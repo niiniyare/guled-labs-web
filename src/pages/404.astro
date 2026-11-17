@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Page not found" showFooterCta={false}>
+  <section class="container nf">
+    <h1 class="display display-xl">This page isn’t here.</h1>
+    <p class="lead">The link may be old, or the address mistyped. Try one of these instead.</p>
+    <div class="btn-row">
+      <a class="btn btn--dark" href="/">Go to the homepage</a>
+      <a class="btn btn--outline" href="/contact">Contact us</a>
+    </div>
+  </section>
+</Base>
+<style>.nf { display: flex; flex-direction: column; gap: 24px; align-items: flex-start; padding-block: 96px 120px; }</style>

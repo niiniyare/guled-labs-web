@@ -1,0 +1,360 @@
+---
+import { nav, site, industryTheme, type IndustryKey } from '../config/site';
+import Logo from './Logo.astro';
+
+interface Props { industry?: IndustryKey }
+const { industry } = Astro.props;
+const theme = industry ? industryTheme[industry] : null;
+const navBg = theme ? theme.bg : '#ECEEEB';
+const navFg = theme ? theme.fg : '#1D2329';
+const ctaBg = theme && theme.fg === '#FFFFFF' ? '#FFFFFF' : '#1D2329';
+const ctaFg = theme && theme.fg === '#FFFFFF' ? '#1D2329' : '#FFFFFF';
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href?: string) => !!href && href.split('#')[0] === path && !href.includes('#');
+const topGroups = nav.filter((g) => g.top);
+---
+<header class="site-header" data-header style={`--nav-bg:${navBg};--nav-fg:${navFg};--cta-bg:${ctaBg};--cta-fg:${ctaFg}`}>
+  <div class="bar-wrap">
+    <div class="bar container">
+      <a class="brand" href="/" aria-label={`${site.brand} home`}>
+        <Logo />
+        <span class="brand-name">{site.brand}</span>
+      </a>
+
+      <nav class="desk-nav" aria-label="Main">
+        <ul role="list">
+          {topGroups.map((g) => (
+            <li>
+              <button
+                type="button"
+                class:list={['mega-trigger', { 'is-section': g.id === 'solutions' && industry }]}
+                aria-expanded="false"
+                aria-controls={`mega-${g.id}`}
+                data-mega={g.id}
+              >
+                {g.label}
+                <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+              </button>
+            </li>
+          ))}
+          <li><a class="nav-link" href="/pricing" aria-current={isCurrent('/pricing') ? 'page' : undefined}>Pricing</a></li>
+        </ul>
+      </nav>
+
+      <div class="desk-actions">
+        <a class="nav-link" href={site.appUrl}>Sign in</a>
+        <a class="nav-link" href="/contact">Contact sales</a>
+        <a class="cta" href="/demo">Book a demo</a>
+      </div>
+
+      <div class="mob-actions">
+        <a class="cta cta--small" href="/demo">Demo</a>
+        <button type="button" class="burger" data-burger aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+          <svg class="icon-open" aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10" /></svg>
+          <svg class="icon-close" aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop mega menus -->
+  {topGroups.map((g) => (
+    <div class="mega" id={`mega-${g.id}`} role="region" aria-label={g.label} hidden>
+      <div class="mega-inner container">
+        <div class="mega-cols">
+          {g.sections.map((s) => (
+            <div class="mega-col">
+              {s.href ? (
+                <a class="mega-title mega-title--link" href={s.href} aria-current={isCurrent(s.href) ? 'page' : undefined} style={`--dot:${s.industry ? industryTheme[s.industry].bg : '#1D2329'}`}>
+                  <span class="dot" aria-hidden="true"></span>{s.title}
+                </a>
+              ) : (
+                <span class="mega-title">{s.title}</span>
+              )}
+              <ul role="list">
+                {s.links.map((l) => (
+                  <li>
+                    <a class="mega-link" href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>
+                      <span class="mega-link-label">{l.label}</span>
+                      {l.desc && <span class="mega-link-desc">{l.desc}</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        {g.aside && (
+          <div class="mega-aside">
+            <strong>{g.aside.title}</strong>
+            <span>{g.aside.text}</span>
+            <a href={g.aside.href}>{g.aside.link}</a>
+          </div>
+        )}
+      </div>
+    </div>
+  ))}
+
+  <!-- Mobile menu: two-level accordion -->
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Main" hidden>
+    <div class="mobile-inner">
+      <ul role="list" class="m-groups">
+        {nav.map((g) => (
+          <li class="m-group">
+            <button type="button" class="m-group-btn" aria-expanded="false" aria-controls={`m-${g.id}`} data-acc="group">
+              <span>{g.label}</span>
+              <svg class="plus" aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path class="v" d="M12 5v14" /><path d="M5 12h14" /></svg>
+            </button>
+            <div class="m-group-panel" id={`m-${g.id}`} hidden>
+              {g.sections.map((s, i) => (
+                <div class="m-section" style={`--dot:${s.industry ? industryTheme[s.industry].bg : 'transparent'}`}>
+                  <button type="button" class="m-section-btn" aria-expanded="false" aria-controls={`m-${g.id}-${i}`} data-acc="section">
+                    {s.industry && <span class="dot" aria-hidden="true"></span>}
+                    <span class="m-section-title">{s.title}</span>
+                    <svg class="chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+                  </button>
+                  <ul role="list" class="m-links" id={`m-${g.id}-${i}`} hidden>
+                    {s.href && <li><a class="m-link m-link--overview" href={s.href}>{s.title} overview</a></li>}
+                    {s.links.map((l) => <li><a class="m-link" href={l.href}>{l.label}</a></li>)}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </li>
+        ))}
+        <li class="m-group"><a class="m-group-btn m-plain" href="/pricing">Pricing</a></li>
+      </ul>
+
+      <div class="m-ctas">
+        <a class="btn btn--dark" href="/demo">Book a demo</a>
+        <div class="m-cta-pair">
+          <a class="btn btn--outline" href="/contact">Contact sales</a>
+          <a class="btn btn--outline" href={site.appUrl}>Sign in</a>
+        </div>
+      </div>
+
+      <div class="m-contact">
+        <strong>Talk to a person</strong>
+        <a href={site.contacts.salesPhoneHref}><span>Call sales</span><strong>{site.contacts.salesPhone}</strong></a>
+        <a href={site.contacts.whatsappHref}><span>WhatsApp</span><strong>{site.contacts.whatsapp}</strong></a>
+        <a href={site.contacts.emailHref}><span>Email</span><strong>{site.contacts.email}</strong></a>
+        <span class="small">Support for live customers: {site.contacts.supportHours}</span>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--nav-bg); color: var(--nav-fg);
+  }
+  .bar-wrap { border-bottom: 1px solid color-mix(in srgb, var(--nav-fg) 14%, transparent); }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 76px; }
+
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--nav-fg); min-height: 48px; }
+  .brand:hover { color: var(--nav-fg); }
+  .brand-name { font-weight: 850; font-stretch: 72%; font-size: 28px; line-height: 1; white-space: nowrap; }
+
+  .desk-nav ul { display: flex; align-items: center; gap: 2px; }
+  .mega-trigger, .nav-link {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 12px;
+    background: transparent; border: 0; border-radius: 8px; color: var(--nav-fg);
+    font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap;
+  }
+  .nav-link:hover, .mega-trigger:hover { color: var(--nav-fg); background: color-mix(in srgb, var(--nav-fg) 10%, transparent); }
+  .mega-trigger[aria-expanded='true'] { background: color-mix(in srgb, var(--nav-fg) 16%, transparent); }
+  .mega-trigger[aria-expanded='true'] svg { transform: rotate(180deg); }
+  .mega-trigger svg { transition: transform .15s; }
+  .mega-trigger.is-section { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+  .nav-link[aria-current='page'] { text-decoration: underline; text-underline-offset: 6px; }
+
+  .desk-actions { display: flex; align-items: center; gap: 2px; }
+  .cta {
+    display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; margin-left: 6px;
+    background: var(--cta-bg); color: var(--cta-fg); border-radius: var(--radius);
+    font-weight: 700; font-size: 16px; text-decoration: none; white-space: nowrap;
+  }
+  .cta:hover { color: var(--cta-fg); filter: brightness(1.08); }
+  .cta--small { padding: 0 14px; font-size: 15px; margin: 0; }
+
+  .mob-actions { display: none; align-items: center; gap: 8px; }
+  .burger {
+    width: 48px; height: 48px; border-radius: var(--radius); border: 2px solid var(--nav-fg);
+    background: transparent; color: var(--nav-fg); display: grid; place-items: center; cursor: pointer; padding: 0;
+  }
+  .burger .icon-close { display: none; }
+  .burger[aria-expanded='true'] .icon-open { display: none; }
+  .burger[aria-expanded='true'] .icon-close { display: block; }
+
+  /* mega */
+  .mega {
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: var(--paper); color: var(--graphite);
+    border-top: 2px solid var(--graphite); border-bottom: 2px solid var(--graphite);
+    box-shadow: 0 24px 48px rgba(29, 35, 41, 0.12);
+  }
+  .mega-inner { display: flex; flex-wrap: wrap; gap: 32px; padding-block: 32px 36px; }
+  .mega-cols { flex: 3 1 760px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 28px 28px; align-content: start; }
+  .mega-col { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .mega-title {
+    display: flex; align-items: center; gap: 10px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--line); font-size: 15px; font-weight: 600; color: var(--slate);
+  }
+  .mega-title--link {
+    color: var(--graphite); text-decoration: none; border-bottom: 2px solid var(--dot);
+    font-weight: 850; font-stretch: 72%; font-size: 24px; line-height: 1;
+  }
+  .dot { width: 14px; height: 14px; border-radius: 4px; background: var(--dot); flex-shrink: 0; }
+  .mega-link { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; text-decoration: none; color: var(--graphite); }
+  .mega-link:hover .mega-link-label { text-decoration: underline; text-underline-offset: 4px; }
+  .mega-link[aria-current='page'] .mega-link-label { text-decoration: underline; }
+  .mega-link-label { font-size: 16px; font-weight: 600; }
+  .mega-link-desc { font-size: 14px; line-height: 1.4; color: var(--slate); }
+  .mega-aside {
+    flex: 1 1 240px; align-self: flex-start; background: var(--graphite); color: #fff; border-radius: 12px; padding: 22px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .mega-aside strong { font-weight: 850; font-stretch: 72%; font-size: 26px; line-height: 1.05; }
+  .mega-aside span { font-size: 15px; color: #d5dade; }
+  .mega-aside a { color: var(--signal); font-weight: 700; margin-top: auto; padding-top: 8px; }
+
+  /* mobile menu */
+  .mobile-menu {
+    position: fixed; left: 0; right: 0; top: var(--hdr-h, 77px); bottom: 0;
+    background: var(--paper); color: var(--graphite); overflow-y: auto; overscroll-behavior: contain;
+    border-top: 2px solid var(--graphite);
+  }
+  .mobile-inner { padding: 8px 20px 40px; max-width: 640px; margin-inline: auto; }
+  .m-group { border-bottom: 1px solid var(--line); }
+  .m-group-btn {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: transparent; border: 0; padding: 18px 2px; min-height: 60px; cursor: pointer; text-align: left;
+    font-weight: 850; font-stretch: 72%; font-size: 30px; line-height: 1; color: var(--graphite); text-decoration: none;
+  }
+  .m-group-btn[aria-expanded='true'] .plus .v { display: none; }
+  .m-group-panel { display: flex; flex-direction: column; gap: 6px; padding-bottom: 16px; }
+  .m-group-panel[hidden] { display: none; }
+  .m-section { border-radius: 12px; }
+  .m-section:has([aria-expanded='true']) { background: var(--concrete); }
+  .m-section-btn {
+    width: 100%; display: flex; align-items: center; gap: 12px; background: transparent; border: 0;
+    padding: 14px 12px; min-height: 52px; cursor: pointer; text-align: left; color: var(--graphite);
+  }
+  .m-section-title { flex: 1; font-size: 18px; font-weight: 700; }
+  .m-section-btn .chev { transition: transform .15s; }
+  .m-section-btn[aria-expanded='true'] .chev { transform: rotate(180deg); }
+  .m-links { padding: 0 12px 12px 38px; }
+  .m-link { display: block; padding: 11px 0; font-size: 16px; color: var(--graphite); text-decoration: none; }
+  .m-link--overview { font-weight: 700; text-decoration: underline; }
+  .m-ctas { display: flex; flex-direction: column; gap: 10px; padding-top: 24px; }
+  .m-cta-pair { display: flex; gap: 10px; }
+  .m-cta-pair .btn { flex: 1; padding: 0 12px; font-size: 16px; }
+  .m-contact {
+    margin-top: 24px; background: var(--concrete); border-radius: 12px; padding: 18px;
+    display: flex; flex-direction: column;
+  }
+  .m-contact > strong { font-size: 17px; padding-bottom: 6px; }
+  .m-contact a { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; text-decoration: none; border-top: 1px solid var(--line); }
+  .m-contact a:first-of-type { border-top: 0; }
+  .m-contact .small { padding-top: 8px; }
+
+  @media (max-width: 1099px) {
+    .desk-actions .nav-link:nth-child(2) { display: none; }
+  }
+  @media (max-width: 959px) {
+    .desk-nav, .desk-actions, .mega { display: none !important; }
+    .mob-actions { display: flex; }
+  }
+  @media (min-width: 960px) {
+    .mobile-menu { display: none !important; }
+  }
+  :global(body.menu-open) { overflow: hidden; }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  if (header) {
+    const barWrap = header.querySelector<HTMLElement>('.bar-wrap')!;
+    const setHeaderHeight = () =>
+      document.documentElement.style.setProperty('--hdr-h', `${barWrap.getBoundingClientRect().bottom}px`);
+
+    // ── desktop mega menus ──
+    let openId: string | null = null;
+    const triggerFor = (id: string) => header.querySelector<HTMLButtonElement>(`[data-mega="${id}"]`)!;
+    const panelFor = (id: string) => document.getElementById(`mega-${id}`)!;
+
+    const closeMega = (returnFocus = false) => {
+      if (!openId) return;
+      const t = triggerFor(openId);
+      t.setAttribute('aria-expanded', 'false');
+      panelFor(openId).hidden = true;
+      if (returnFocus) t.focus();
+      openId = null;
+    };
+    const openMega = (id: string) => {
+      closeMega();
+      triggerFor(id).setAttribute('aria-expanded', 'true');
+      panelFor(id).hidden = false;
+      openId = id;
+    };
+    header.querySelectorAll<HTMLButtonElement>('[data-mega]').forEach((t) => {
+      t.addEventListener('click', () => (openId === t.dataset.mega ? closeMega() : openMega(t.dataset.mega!)));
+    });
+    document.addEventListener('click', (e) => {
+      if (openId && !header.contains(e.target as Node)) closeMega();
+    });
+    // Close the mega menu when focus leaves the header (keyboard users tabbing on)
+    header.addEventListener('focusout', (e) => {
+      const next = e.relatedTarget as Node | null;
+      if (openId && next && !header.contains(next)) closeMega();
+    });
+
+    // ── mobile menu ──
+    const burger = header.querySelector<HTMLButtonElement>('[data-burger]')!;
+    const menu = document.getElementById('mobile-menu')!;
+    let mobileOpen = false;
+    const setMobile = (open: boolean, returnFocus = false) => {
+      mobileOpen = open;
+      if (open) setHeaderHeight();
+      menu.hidden = !open;
+      burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.body.classList.toggle('menu-open', open);
+      if (!open && returnFocus) burger.focus();
+    };
+    burger.addEventListener('click', () => setMobile(!mobileOpen));
+
+    // accordion: opening a group closes its siblings; sections toggle on their own
+    header.querySelectorAll<HTMLButtonElement>('[data-acc]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const expand = btn.getAttribute('aria-expanded') !== 'true';
+        if (btn.dataset.acc === 'group' && expand) {
+          header.querySelectorAll<HTMLButtonElement>('[data-acc="group"][aria-expanded="true"]').forEach((other) => {
+            other.setAttribute('aria-expanded', 'false');
+            document.getElementById(other.getAttribute('aria-controls')!)!.hidden = true;
+          });
+        }
+        btn.setAttribute('aria-expanded', String(expand));
+        document.getElementById(btn.getAttribute('aria-controls')!)!.hidden = !expand;
+      });
+    });
+
+    // links inside the mobile menu that jump within the page should close it
+    menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMobile(false)));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (openId) closeMega(true);
+      if (mobileOpen) setMobile(false, true);
+    });
+
+    // reset when crossing the breakpoint
+    const mq = window.matchMedia('(min-width: 960px)');
+    mq.addEventListener('change', () => {
+      closeMega();
+      setMobile(false);
+    });
+    window.addEventListener('resize', () => mobileOpen && setHeaderHeight());
+  }
+</script>

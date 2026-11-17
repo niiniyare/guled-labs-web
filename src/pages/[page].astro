@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import { pages, type SimplePage } from '../data/pages';
+export function getStaticPaths() {
+  return pages.map((page) => ({ params: { page: page.slug }, props: { page } }));
+}
+const { page } = Astro.props as { page: SimplePage };
+---
+<Base title={page.title} description={page.lead}>
+  <article class="container prose-page">
+    <h1 class="display display-xl">{page.title}</h1>
+    <p class="lead">{page.lead}</p>
+    <div class="body">
+      {page.body.map((b) => (
+        <section>
+          {b.h && <h2>{b.h}</h2>}
+          <p>{b.p}</p>
+        </section>
+      ))}
+    </div>
+    {page.cta && <a class="btn btn--dark" href={page.cta.href}>{page.cta.label}</a>}
+  </article>
+</Base>
+<style>
+  .prose-page { display: flex; flex-direction: column; gap: 28px; align-items: flex-start; padding-block: 64px 104px; }
+  .body { max-width: 720px; display: flex; flex-direction: column; gap: 28px; border-top: 2px solid var(--graphite); padding-top: 28px; }
+  .body h2 { font-size: 24px; margin-bottom: 8px; }
+  .body p { font-size: 18px; line-height: 1.6; color: var(--ink-2); }
+</style>

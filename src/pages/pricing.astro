@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+const plans = [
+  { name: 'Single site', price: '[KES —]', per: 'per site / month', for: 'One station, shop, restaurant or pharmacy.', items: ['Point of sale and stock', 'KRA eTIMS and M-Pesa', 'Accounting and owner app', 'Phone and WhatsApp support'], cta: 'Book a demo', href: '/demo', featured: false },
+  { name: 'Growing business', price: '[KES —]', per: 'per site / month', for: '2 to 10 branches, or more than one trade.', items: ['Everything in Single site', 'Branch transfers and combined reports', 'HR, payroll and attendance', 'Device integrations (pumps, tanks, scales)'], cta: 'Book a demo', href: '/demo', featured: true },
+  { name: 'Group', price: 'Custom', per: 'priced per group', for: 'Networks, dealers and chains.', items: ['Everything in Growing business', 'Your own server or private cloud', 'API access and custom integrations', 'Named account manager'], cta: 'Contact sales', href: '/contact', featured: false },
+];
+---
+<Base title="Pricing" description="Simple per-site pricing for fuel stations, shops, restaurants and pharmacies, with setup and training included.">
+  <section class="container head">
+    <h1 class="display display-xl">Pricing</h1>
+    <p class="lead">Priced per site, per month. Setup, data import and on-site training are a one-off fee: [KES —]. [Replace with your real prices.]</p>
+  </section>
+  <section class="container plans">
+    {plans.map((p) => (
+      <article class:list={['plan', { featured: p.featured }]}>
+        <h2 class="display">{p.name}</h2>
+        <p class="for">{p.for}</p>
+        <p class="price"><span class="display">{p.price}</span> <span class="per">{p.per}</span></p>
+        <ul role="list">{p.items.map((i) => <li>{i}</li>)}</ul>
+        <a class:list={['btn', p.featured ? 'btn--signal' : 'btn--dark']} href={p.href}>{p.cta}</a>
+      </article>
+    ))}
+  </section>
+  <section class="container note">
+    <p class="muted">Prices exclude VAT. Hardware (terminals, printers, scales, pump controllers) can be supplied at cost or you can use your own. [Confirm.]</p>
+  </section>
+</Base>
+<style>
+  .head { display: flex; flex-direction: column; gap: 20px; padding-block: 64px 48px; }
+  .plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .plan { background: #fff; border: 2px solid var(--graphite); border-radius: var(--radius-lg); padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+  .plan.featured { background: var(--graphite); color: #fff; }
+  .plan h2 { font-size: 36px; line-height: 1; }
+  .for { color: var(--ink-2); }
+  .featured .for { color: var(--on-dark-muted); }
+  .price .display { font-size: 44px; }
+  .per { font-size: 15px; color: var(--slate); }
+  .featured .per { color: var(--on-dark-muted); }
+  .plan ul { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 16px; flex: 1; }
+  .featured ul { border-color: var(--line-dark); }
+  .plan li { padding-left: 26px; position: relative; }
+  .plan li::before { content: ''; position: absolute; left: 0; top: 7px; width: 12px; height: 7px; border-left: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor; transform: rotate(-45deg); }
+  .note { padding-block: 32px 96px; }
+  @media (max-width: 960px) { .plans { grid-template-columns: minmax(0, 1fr); } }
+</style>

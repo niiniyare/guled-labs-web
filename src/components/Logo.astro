@@ -1,0 +1,11 @@
+---
+// The mark: a printed receipt with the signal-yellow tear line.
+interface Props { size?: number }
+const { size = 34 } = Astro.props;
+---
+<svg aria-hidden="true" width={Math.round(size * 0.82)} height={size} viewBox="0 0 28 34">
+  <path d="M0 4a4 4 0 0 1 4-4h20a4 4 0 0 1 4 4v30H0z" fill="#1D2329" />
+  <rect x="6" y="9" width="16" height="2" fill="#FFFFFF" />
+  <rect x="6" y="15" width="11" height="2" fill="#FFFFFF" />
+  <rect x="6" y="22" width="16" height="3" fill="#FFC629" />
+</svg>

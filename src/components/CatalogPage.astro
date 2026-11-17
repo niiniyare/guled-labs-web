@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import type { CatalogItem } from '../data/catalog';
+import { industries } from '../data/industries';
+import { industryTheme } from '../config/site';
+
+interface Props { item: CatalogItem; all: CatalogItem[]; section: 'Products' | 'Integrations'; base: string }
+const { item, all, section, base } = Astro.props;
+const related = item.related.map((s) => all.find((a) => a.slug === s)).filter(Boolean) as CatalogItem[];
+const usedIn = industries.filter((i) => item.industries.includes(i.key));
+---
+<Base title={item.name} description={item.lead}>
+  <section class="container cat-hero">
+    <nav aria-label="Breadcrumb" class="crumbs"><span>{section}</span> <span aria-hidden="true">/</span> <span aria-current="page">{item.name}</span></nav>
+    <h1 class="display display-xl">{item.h1}</h1>
+    <p class="lead">{item.lead}</p>
+    <div class="btn-row">
+      <a class="btn btn--dark" href="/demo">Book a demo</a>
+      <a class="btn btn--outline" href="/contact">Ask a question</a>
+    </div>
+  </section>
+
+  <section class="bg-paper section">
+    <div class="container cat-body">
+      <h2 class="display display-md">What it does</h2>
+      <ul class="rule-list points">
+        {item.points.map((p) => <li><strong>{p.title}</strong><p>{p.text}</p></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section container cat-meta">
+    <div>
+      <h2 class="display display-md">Used by</h2>
+      <ul role="list" class="used">
+        {usedIn.map((i) => (
+          <li><a href={`/industries/${i.slug}`}><span class="sw" aria-hidden="true" style={`background:${industryTheme[i.key].bg}`}></span>{i.name}</a></li>
+        ))}
+      </ul>
+    </div>
+    {related.length > 0 && (
+      <div>
+        <h2 class="display display-md">Works well with</h2>
+        <ul role="list" class="used">
+          {related.map((r) => <li><a href={`${base}/${r.slug}`}>{r.name}</a></li>)}
+        </ul>
+      </div>
+    )}
+  </section>
+</Base>
+
+<style>
+  .cat-hero { display: flex; flex-direction: column; gap: 24px; align-items: flex-start; padding-block: 64px 88px; }
+  .cat-hero h1 { max-width: 1000px; }
+  .crumbs { font-size: 15px; font-weight: 600; color: var(--ink-2); }
+  .cat-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 32px 48px; }
+  .points li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 8px 24px; }
+  .points strong { font-size: 19px; }
+  .points p { color: var(--ink-2); }
+  .cat-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 48px; }
+  .used { margin-top: 20px; border-top: 2px solid var(--graphite); }
+  .used a { display: flex; align-items: center; gap: 10px; padding: 16px 0; border-bottom: 1px solid var(--line); font-weight: 700; font-size: 18px; text-decoration: none; }
+  .used a:hover { text-decoration: underline; }
+  .sw { width: 14px; height: 14px; border-radius: 4px; }
+  @media (max-width: 860px) {
+    .cat-body, .points li { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

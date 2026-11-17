@@ -1,0 +1,195 @@
+---
+// A receipt that prints line by line, with a label beside each line
+// saying what happened behind it. Without JavaScript the first receipt
+// is shown in full. With reduced motion it appears without animating.
+import { receipts } from '../data/receipts';
+import { industryTheme, type IndustryKey } from '../config/site';
+
+interface Props {
+  industries?: IndustryKey[];
+  initial?: IndustryKey;
+  picker?: boolean;
+  start?: 'load' | 'visible';
+}
+const { industries = ['fuel', 'retail', 'restaurant', 'pharmacy'], initial = industries[0], picker = true, start = 'load' } = Astro.props;
+const uid = `rp-${Math.random().toString(36).slice(2, 8)}`;
+const toneColor = (k: IndustryKey, tone?: string) =>
+  tone === 'ok' ? '#3FC98A' : tone === 'industry' ? industryTheme[k].soft : '#FFC629';
+---
+<div class="rp" data-receipt-printer data-start={start} id={uid}>
+  {picker && (
+    <div class="rp-picker">
+      <span class="rp-picker-label" id={`${uid}-label`}>Print a sample receipt from a</span>
+      <div class="rp-tabs" role="group" aria-labelledby={`${uid}-label`}>
+        {industries.map((k) => (
+          <button type="button" class="rp-tab" data-pick={k} aria-pressed={k === initial ? 'true' : 'false'} style={`--sw:${industryTheme[k].bg}`}>
+            <span class="rp-sw" aria-hidden="true"></span>{receipts[k].label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <div class="rp-stage">
+    <div class="rp-printer" aria-hidden="true"><span></span></div>
+    {industries.map((k) => (
+      <div class="rp-receipt" data-receipt={k} hidden={k !== initial} aria-label={`Sample ${receipts[k].label.toLowerCase()} receipt`} role="figure">
+        {receipts[k].rows.map((r, i) => (
+          <div class:list={['rp-row', `rp-k-${r.kind}`, { 'rp-first': i === 0 }]} data-row>
+            <div class="rp-paper">
+              {(r.kind === 'head' || r.kind === 'sub') && <span class="rp-center">{r.text}</span>}
+              {r.kind === 'rule' && <span class="rp-rule"></span>}
+              {(r.kind === 'line' || r.kind === 'total') && (
+                <span class="rp-line"><span>{r.left}</span><span>{r.right}</span></span>
+              )}
+              {r.kind === 'etims' && (
+                <span class="rp-etims">
+                  <svg role="img" aria-label="Sample eTIMS QR code" width="64" height="64" viewBox="0 0 9 9" shape-rendering="crispEdges"><rect width="9" height="9" fill="#fff" /><path fill="#1D2329" d="M0 0h3v3H0zM6 0h3v3H6zM0 6h3v3H0zM4 0h1v2H4zM4 3h2v1H4zM3 4h1v2H3zM5 5h2v1H5zM7 4h2v1H7zM4 7h1v2H4zM6 7h1v1H6zM8 6h1v3H8zM5 8h2v1H5z" /><path fill="#fff" d="M1 1h1v1H1zM7 1h1v1H7zM1 7h1v1H1z" /></svg>
+                  <span><strong>KRA eTIMS</strong><br /><span class="rp-dim">CU No. KRACU0XXXXXXX</span><br /><span class="rp-dim">Invoice 0XXXXX</span></span>
+                </span>
+              )}
+            </div>
+            {'note' in r && r.note && (
+              <div class="rp-note-wrap">
+                <span class="rp-note"><span class="rp-note-dot" aria-hidden="true" style={`background:${toneColor(k, 'tone' in r ? r.tone : undefined)}`}></span>{r.note}</span>
+              </div>
+            )}
+          </div>
+        ))}
+        <div class="rp-tear" data-tear aria-hidden="true">
+          <svg width="320" height="10" viewBox="0 0 320 10" preserveAspectRatio="none"><path d="M0 0H320V2L310 10L300 2L290 10L280 2L270 10L260 2L250 10L240 2L230 10L220 2L210 10L200 2L190 10L180 2L170 10L160 2L150 10L140 2L130 10L120 2L110 10L100 2L90 10L80 2L70 10L60 2L50 10L40 2L30 10L20 2L10 10L0 2Z" fill="#fff" /></svg>
+        </div>
+      </div>
+    ))}
+    <p class="rp-caption small">Sample receipt. Prices and numbers are for illustration.</p>
+  </div>
+</div>
+
+<style>
+  .rp { display: flex; flex-direction: column; gap: 28px; }
+  .rp-picker { display: flex; flex-direction: column; gap: 12px; }
+  .rp-picker-label { font-size: 15px; font-weight: 600; }
+  .rp-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .rp-tab {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 18px;
+    border-radius: var(--radius); border: 2px solid var(--graphite); background: transparent; color: var(--graphite);
+    font-size: 16px; font-weight: 600; cursor: pointer;
+  }
+  .rp-tab:hover { background: rgba(29, 35, 41, 0.08); }
+  .rp-tab[aria-pressed='true'] { background: var(--graphite); color: #fff; }
+  .rp-sw { width: 12px; height: 12px; border-radius: 3px; background: var(--sw); }
+
+  .rp-stage { min-height: 600px; }
+  .rp-printer {
+    width: 368px; max-width: 100%; height: 44px; background: var(--graphite);
+    border-radius: 12px 12px 4px 4px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px;
+  }
+  .rp-printer span { width: 90%; height: 6px; background: #0e1215; border-radius: 3px; }
+  .rp-receipt { padding-left: 24px; }
+  .rp-receipt[hidden] { display: none; }
+
+  .rp-row { display: grid; grid-template-columns: 320px minmax(0, 1fr); align-items: center; justify-items: start; }
+  .rp-paper { width: 320px; max-width: 100%; justify-self: stretch; }
+  .rp-row.is-pending, .rp-tear.is-pending { display: none; }
+  .rp-row.is-new .rp-paper { animation: feed .18s ease-out; }
+  @keyframes feed { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+  .rp-row.is-new .rp-note { animation: pop .25s ease-out; }
+  @keyframes pop { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+
+  .rp-paper {
+    background: #fff; padding: 3px 24px; font-family: var(--mono); font-size: 14px; line-height: 1.5; color: var(--graphite);
+  }
+  .rp-first .rp-paper { padding-top: 22px; }
+  .rp-k-rule .rp-paper { padding-block: 10px; }
+  .rp-k-etims .rp-paper { padding-block: 6px 16px; }
+  .rp-center { display: block; text-align: center; }
+  .rp-k-head .rp-paper { font-weight: 600; }
+  .rp-k-sub .rp-paper { color: var(--slate); }
+  .rp-k-rule .rp-paper > span { display: block; border-top: 1px dashed #a9b0aa; }
+  .rp-line { display: flex; justify-content: space-between; gap: 12px; }
+  .rp-k-total .rp-paper { font-weight: 600; }
+  .rp-etims { display: flex; gap: 14px; align-items: center; font-size: 12px; line-height: 1.6; }
+  .rp-dim { color: var(--slate); }
+
+  .rp-note-wrap { display: flex; align-items: center; }
+  .rp-note-wrap::before { content: ''; width: 28px; height: 2px; background: var(--graphite); flex-shrink: 0; }
+  .rp-note {
+    display: inline-flex; align-items: center; gap: 8px; background: var(--graphite); color: #fff;
+    font-size: 14px; font-weight: 600; padding: 7px 12px; border-radius: 8px;
+  }
+  .rp-note-dot { width: 8px; height: 8px; border-radius: 99px; flex-shrink: 0; }
+
+  .rp-tear svg { width: 320px; max-width: 100%; height: 10px; }
+  .rp-caption { margin-top: 18px; padding-left: 24px; }
+
+  @media (max-width: 640px) {
+    .rp-receipt { padding-left: 0; }
+    .rp-row { grid-template-columns: minmax(0, 1fr); max-width: 360px; justify-items: stretch; }
+    .rp-paper { width: auto; }
+    .rp-note-wrap { background: #fff; padding: 2px 24px 8px; }
+    .rp-note-wrap::before { display: none; }
+    .rp-note { font-size: 13px; padding: 5px 10px; }
+    .rp-tear svg { width: 100%; }
+    .rp-caption { padding-left: 0; }
+  }
+</style>
+
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-receipt-printer]').forEach((root) => {
+    let timer: number | undefined;
+
+    const print = (key: string) => {
+      window.clearInterval(timer);
+      root.querySelectorAll<HTMLElement>('[data-receipt]').forEach((r) => (r.hidden = r.dataset.receipt !== key));
+      root.querySelectorAll<HTMLButtonElement>('[data-pick]').forEach((b) =>
+        b.setAttribute('aria-pressed', String(b.dataset.pick === key)),
+      );
+      const receipt = root.querySelector<HTMLElement>(`[data-receipt="${key}"]`);
+      if (!receipt) return;
+      const rows = [...receipt.querySelectorAll<HTMLElement>('[data-row]')];
+      const tear = receipt.querySelector<HTMLElement>('[data-tear]')!;
+      rows.forEach((r) => r.classList.remove('is-new'));
+      if (reduce) {
+        rows.forEach((r) => r.classList.remove('is-pending'));
+        tear.classList.remove('is-pending');
+        return;
+      }
+      rows.forEach((r) => r.classList.add('is-pending'));
+      tear.classList.add('is-pending');
+      let i = 0;
+      timer = window.setInterval(() => {
+        if (i < rows.length) {
+          rows[i].classList.remove('is-pending');
+          rows[i].classList.add('is-new');
+          i++;
+        } else {
+          tear.classList.remove('is-pending');
+          window.clearInterval(timer);
+        }
+      }, 190);
+    };
+
+    root.querySelectorAll<HTMLButtonElement>('[data-pick]').forEach((b) =>
+      b.addEventListener('click', () => print(b.dataset.pick!)),
+    );
+
+    const first = root.querySelector<HTMLElement>('[data-receipt]:not([hidden])')?.dataset.receipt;
+    if (!first) return;
+    if (root.dataset.start === 'visible' && 'IntersectionObserver' in window && !reduce) {
+      // Hold the paper back until the printer scrolls into view.
+      const r = root.querySelector<HTMLElement>(`[data-receipt="${first}"]`)!;
+      r.querySelectorAll<HTMLElement>('[data-row], [data-tear]').forEach((el) => el.classList.add('is-pending'));
+      const io = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          print(first);
+        }
+      }, { threshold: 0.3 });
+      io.observe(root);
+    } else {
+      print(first);
+    }
+  });
+</script>

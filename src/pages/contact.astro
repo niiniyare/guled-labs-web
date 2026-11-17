@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { site } from '../config/site';
+const c = site.contacts;
+---
+<Base title="Contact sales" showFooterCta={false} description={`Talk to ${site.brand} about software for your fuel station, shop, restaurant or pharmacy.`}>
+  <section class="container contact">
+    <div class="contact-intro">
+      <h1 class="display display-xl">Talk to us</h1>
+      <p class="lead">Tell us about your business and we’ll get back to you within one working day. Prefer to talk now? Call or WhatsApp.</p>
+      <dl class="ways">
+        <div><dt>Call sales</dt><dd><a href={c.salesPhoneHref}>{c.salesPhone}</a></dd></div>
+        <div><dt>WhatsApp</dt><dd><a href={c.whatsappHref}>{c.whatsapp}</a></dd></div>
+        <div><dt>Email</dt><dd><a href={c.emailHref}>{c.email}</a></dd></div>
+        <div id="visit"><dt>Office</dt><dd>{site.address}, {site.city}</dd></div>
+        <div><dt>Already a customer?</dt><dd><a href="/help">Get support</a> · {c.supportPhone}</dd></div>
+      </dl>
+    </div>
+    <div class="contact-form">
+      <ContactForm topic="sales" submitLabel="Send" />
+    </div>
+  </section>
+</Base>
+<style>
+  .contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 48px 64px; padding-block: 64px 104px; }
+  .contact-intro { display: flex; flex-direction: column; gap: 24px; }
+  .ways { border-top: 2px solid var(--graphite); }
+  .ways > div { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .ways dt { color: var(--ink-2); }
+  .ways dd { font-weight: 700; }
+  .contact-form { background: #fff; border-radius: var(--radius-lg); padding: clamp(24px, 4vw, 40px); }
+  @media (max-width: 960px) { .contact { grid-template-columns: minmax(0, 1fr); } }
+</style>

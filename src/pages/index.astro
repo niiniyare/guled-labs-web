@@ -1,0 +1,184 @@
+---
+import Base from '../layouts/Base.astro';
+import ReceiptPrinter from '../components/ReceiptPrinter.astro';
+import OwnerDashboard from '../components/OwnerDashboard.astro';
+import { industries } from '../data/industries';
+import { industryTheme, site } from '../config/site';
+---
+<Base>
+  <!-- Hero -->
+  <section class="container hero">
+    <div class="hero-copy">
+      <h1 class="display display-xl">Every sale, compliant from the first receipt.</h1>
+      <p class="lead">One system for fuel stations, supermarkets, restaurants and pharmacies. It talks to KRA eTIMS, M-Pesa, your bank and the machines on your floor, so a sale only gets entered once.</p>
+      <div class="btn-row">
+        <a class="btn btn--dark" href="/demo">Book a demo</a>
+        <a class="btn btn--outline" href="#industries">See all industries</a>
+      </div>
+    </div>
+    <div class="hero-demo">
+      <ReceiptPrinter />
+    </div>
+  </section>
+
+  <!-- Industries -->
+  <section id="industries" class="bg-paper section">
+    <div class="container">
+      <div class="split-head">
+        <h2 class="display display-lg">Built for the trade you're in</h2>
+        <p class="lead">Accounts, stock, payroll and tax are shared. The screens, reports and hardware connections are made for each trade.</p>
+      </div>
+      <ul role="list" class="ind-rows">
+        {industries.map((ind) => (
+          <li>
+            <a class="ind-row" href={`/industries/${ind.slug}`}>
+              <span class="ind-sw" aria-hidden="true" style={`background:${industryTheme[ind.key].bg}`}></span>
+              <span class="display ind-name">{ind.name}</span>
+              <span class="ind-desc">{ind.summary}</span>
+              <span class="text-link">{ind.short} page</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="muted other">Running a hardware store, a distributor or a hotel? It runs on the same platform. <a href="/contact"><strong>Tell us about your business</strong></a></p>
+    </div>
+  </section>
+
+  <!-- Owner view -->
+  <section class="section">
+    <div class="container">
+      <div class="split-head">
+        <h2 class="display display-lg">What you see when the day is done</h2>
+        <p class="lead">Every branch, every till and every pump on one screen, on your phone or laptop. Anything that doesn't add up is flagged for you.</p>
+      </div>
+      <OwnerDashboard />
+    </div>
+  </section>
+
+  <!-- Connections -->
+  <section id="connections" class="bg-dark section">
+    <div class="container">
+      <h2 class="display display-lg hub-title">Plugged into everything that touches your money</h2>
+      <div class="hub">
+        <ul role="list" class="hub-side hub-left">
+          <li class="hub-label">On your floor</li>
+          <li><a href="/integrations/pump-controllers">Pump controllers (PTS-2)</a></li>
+          <li><a href="/integrations/tank-gauges">Tank gauges</a></li>
+          <li><a href="/integrations/scales-printers">Tills, scanners &amp; scales</a></li>
+          <li><a href="/integrations/biometric-clocks">Biometric clocks</a></li>
+        </ul>
+        <div class="hub-core">
+          <span class="display">{site.brand}</span>
+          <span>ERPNext core with industry apps. In the cloud or on your own server.</span>
+        </div>
+        <ul role="list" class="hub-side hub-right">
+          <li class="hub-label">Money &amp; compliance</li>
+          <li><a href="/integrations/kra-etims">KRA eTIMS</a></li>
+          <li><a href="/integrations/mpesa">M-Pesa till &amp; paybill</a></li>
+          <li><a href="/integrations/banks">Bank statements</a></li>
+          <li><a href="/integrations/api">Your own systems (API)</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Story -->
+  <section id="story" class="section container story">
+    <p class="display story-lede">We built this inside a busy highway service station in Machakos County, and ran it there shift after shift before selling it to anyone.</p>
+    <dl class="stats">
+      <div><dt>less unexplained fuel loss</dt><dd class="display">[X]%</dd></div>
+      <div><dt>minutes to close a shift</dt><dd class="display">[X]</dd></div>
+      <div><dt>of sales signed by eTIMS without anyone touching them</dt><dd class="display">[X]%</dd></div>
+    </dl>
+    <a class="text-link" href="/customers">Read how the station runs today</a>
+  </section>
+
+  <!-- Getting started -->
+  <section id="start" class="bg-paper section">
+    <div class="container steps-wrap">
+      <div class="steps-intro">
+        <h2 class="display display-lg">Live in about four weeks</h2>
+        <p class="lead">We set it up on your site with your staff, and we stay for the first shifts.</p>
+        <a class="text-link" href="/pricing">See pricing</a>
+      </div>
+      <ol class="steps">
+        <li><span class="display n">1</span><div><strong>We visit your site</strong><p>Week 1. We map how money and stock move, and list every pump, till and device.</p></div></li>
+        <li><span class="display n">2</span><div><strong>We set it up and test it</strong><p>Weeks 2–3. Items, prices, eTIMS and M-Pesa are set up and tested away from your live tills.</p></div></li>
+        <li><span class="display n">3</span><div><strong>You go live</strong><p>Week 4. Staff are trained on the floor, and we're there for the first shifts.</p></div></li>
+        <li><span class="display n">4</span><div><strong>We keep it running</strong><p>Local support, tax updates and new branches as you grow.</p></div></li>
+      </ol>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 48px 64px;
+    padding-block: 64px 96px; align-items: start;
+  }
+  .hero-copy { display: flex; flex-direction: column; gap: 28px; padding-top: 24px; }
+  @media (max-width: 1023px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+  .ind-rows { border-bottom: 2px solid var(--graphite); }
+  .ind-row {
+    display: grid; grid-template-columns: 56px minmax(0, 1.1fr) minmax(0, 1.2fr) auto; align-items: center; gap: 16px 32px;
+    padding: 28px 0; border-top: 2px solid var(--graphite); text-decoration: none; color: var(--graphite);
+  }
+  .ind-row:hover { color: var(--graphite); }
+  .ind-row:hover .ind-name { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 6px; }
+  .ind-sw { width: 56px; height: 56px; border-radius: var(--radius); }
+  .ind-name { font-size: clamp(36px, 4.4vw, 60px); line-height: 1; }
+  .ind-desc { font-size: 17px; color: var(--ink-2); }
+  .other { margin-top: 40px; }
+  @media (max-width: 860px) {
+    .ind-row { grid-template-columns: 40px minmax(0, 1fr); }
+    .ind-sw { width: 40px; height: 40px; }
+    .ind-desc, .ind-row .text-link { grid-column: 2; }
+  }
+
+  .hub-title { max-width: 760px; margin-bottom: 48px; }
+  .hub { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 300px) minmax(0, 1fr); align-items: center; }
+  .hub-side { display: flex; flex-direction: column; gap: 14px; }
+  .hub-side li:not(.hub-label) { display: flex; align-items: center; }
+  .hub-side li:not(.hub-label)::after, .hub-right li:not(.hub-label)::before {
+    content: ''; flex: 1; min-width: 24px; height: 1px; background: var(--line-dark);
+  }
+  .hub-right li:not(.hub-label)::after { display: none; }
+  .hub-left li:not(.hub-label)::before { display: none; }
+  .hub-label { font-size: 15px; color: #aeb6bd; }
+  .hub-right .hub-label { text-align: right; }
+  .hub-side a {
+    padding: 12px 16px; border: 1px solid var(--line-dark); border-radius: var(--radius);
+    color: #fff; text-decoration: none; font-weight: 600; white-space: nowrap;
+  }
+  .hub-side a:hover { border-color: #fff; color: #fff; }
+  .hub-core {
+    background: var(--signal); color: var(--graphite); border-radius: 18px; padding: 32px 28px;
+    display: flex; flex-direction: column; gap: 10px; text-align: center;
+  }
+  .hub-core .display { font-size: 40px; line-height: 1; }
+  .hub-core span:last-child { font-size: 15px; }
+  @media (max-width: 900px) {
+    .hub { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+    .hub-side li::before, .hub-side li::after { display: none !important; }
+    .hub-right .hub-label { text-align: left; }
+    .hub-core { order: -1; text-align: left; }
+    .hub-side a { white-space: normal; }
+  }
+
+  .story { display: flex; flex-direction: column; gap: 48px; align-items: flex-start; }
+  .story-lede { font-weight: 800; font-stretch: 80%; font-size: clamp(30px, 3.6vw, 48px); line-height: 1.1; max-width: 980px; }
+  .stats { width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); border-top: 2px solid var(--graphite); }
+  .stats > div { padding: 24px 24px 0 0; display: flex; flex-direction: column-reverse; gap: 6px; }
+  .stats dt { color: var(--ink-2); }
+  .stats dd { font-size: 64px; line-height: 1; }
+
+  .steps-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 48px; }
+  .steps-intro { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
+  .steps { list-style: none; padding: 0; border-top: 2px solid var(--graphite); }
+  .steps li { display: flex; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+  .steps .n { font-size: 40px; line-height: 1; width: 40px; flex-shrink: 0; }
+  .steps strong { font-size: 19px; display: block; margin-bottom: 6px; }
+  .steps p { color: var(--ink-2); }
+  @media (max-width: 860px) { .steps-wrap { grid-template-columns: minmax(0, 1fr); } }
+</style>

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://guledlabs.com/sitemap-index.xml

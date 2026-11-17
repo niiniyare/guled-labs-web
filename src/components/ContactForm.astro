@@ -1,0 +1,109 @@
+---
+import { site } from '../config/site';
+import { industries } from '../data/industries';
+interface Props { topic: 'demo' | 'sales'; submitLabel: string }
+const { topic, submitLabel } = Astro.props;
+---
+<form class="cform" data-contact-form action={site.formEndpoint || undefined} method="post" novalidate>
+  <input type="hidden" name="topic" value={topic} />
+  <div class="row">
+    <div class="f">
+      <label for="cf-name">Your name</label>
+      <input id="cf-name" name="name" autocomplete="name" required />
+    </div>
+    <div class="f">
+      <label for="cf-business">Business name</label>
+      <input id="cf-business" name="business" autocomplete="organization" required />
+    </div>
+  </div>
+  <div class="row">
+    <div class="f">
+      <label for="cf-phone">Phone or WhatsApp</label>
+      <input id="cf-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="07XX XXX XXX" />
+    </div>
+    <div class="f">
+      <label for="cf-email">Email <span class="opt">(optional)</span></label>
+      <input id="cf-email" name="email" type="email" autocomplete="email" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="f">
+      <label for="cf-industry">Type of business</label>
+      <select id="cf-industry" name="industry" required>
+        <option value="">Choose one</option>
+        {industries.map((i) => <option value={i.slug}>{i.name}</option>)}
+        <option value="other">Something else</option>
+      </select>
+    </div>
+    <div class="f">
+      <label for="cf-branches">How many branches?</label>
+      <select id="cf-branches" name="branches">
+        <option>1</option><option>2–5</option><option>6–20</option><option>More than 20</option>
+      </select>
+    </div>
+  </div>
+  <div class="f">
+    <label for="cf-message">{topic === 'demo' ? 'Anything we should know before the demo?' : 'How can we help?'} <span class="opt">(optional)</span></label>
+    <textarea id="cf-message" name="message" rows="4"></textarea>
+  </div>
+  <fieldset class="f">
+    <legend>Best way to reach you</legend>
+    <div class="radios">
+      <label><input type="radio" name="contact_by" value="whatsapp" checked /> WhatsApp</label>
+      <label><input type="radio" name="contact_by" value="phone" /> Phone call</label>
+      <label><input type="radio" name="contact_by" value="email" /> Email</label>
+    </div>
+  </fieldset>
+  <div class="submit-row">
+    <button type="submit" class="btn btn--dark">{submitLabel}</button>
+    <p class="status" role="status" aria-live="polite"></p>
+  </div>
+</form>
+
+<style>
+  .cform { display: flex; flex-direction: column; gap: 20px; }
+  .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .f { display: flex; flex-direction: column; gap: 8px; border: 0; padding: 0; margin: 0; min-width: 0; }
+  label, legend { font-weight: 600; font-size: 16px; padding: 0; }
+  .opt { font-weight: 400; color: var(--slate); }
+  input:not([type='radio']), select, textarea {
+    min-height: 52px; padding: 12px 14px; border: 2px solid var(--graphite); border-radius: var(--radius);
+    background: #fff; font-size: 16px; width: 100%;
+  }
+  textarea { resize: vertical; }
+  input[aria-invalid='true'], select[aria-invalid='true'] { border-color: #b3261e; }
+  .radios { display: flex; flex-wrap: wrap; gap: 8px 24px; padding-top: 4px; }
+  .radios label { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; min-height: 44px; }
+  .radios input { width: 20px; height: 20px; accent-color: var(--graphite); }
+  .submit-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  .status { font-weight: 600; }
+  @media (max-width: 640px) { .row { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { submitForm } from '../scripts/forms';
+  document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach((form) => {
+    // Preselect the industry from ?industry=… (set by industry page buttons)
+    const pre = new URLSearchParams(location.search).get('industry');
+    const sel = form.querySelector<HTMLSelectElement>('select[name="industry"]');
+    if (pre && sel && [...sel.options].some((o) => o.value === pre)) sel.value = pre;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const status = form.querySelector<HTMLElement>('.status')!;
+      const required = [...form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[required]')];
+      let firstBad: HTMLElement | null = null;
+      required.forEach((el) => {
+        const bad = !el.value.trim();
+        el.setAttribute('aria-invalid', String(bad));
+        if (bad && !firstBad) firstBad = el;
+      });
+      if (firstBad) {
+        status.textContent = 'Fill in your name, business, phone and type of business so we can reach you.';
+        (firstBad as HTMLElement).focus();
+        return;
+      }
+      submitForm(form, status, 'Thanks. We’ll contact you within one working day.');
+    });
+  });
+</script>

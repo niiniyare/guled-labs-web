@@ -1,0 +1,176 @@
+---
+import Base from '../../layouts/Base.astro';
+import ReceiptPrinter from '../../components/ReceiptPrinter.astro';
+import { industries, type Industry } from '../../data/industries';
+import { industryTheme } from '../../config/site';
+
+export function getStaticPaths() {
+  return industries.map((ind) => ({ params: { slug: ind.slug }, props: { ind } }));
+}
+interface Props { ind: Industry }
+const { ind } = Astro.props;
+const lightText = industryTheme[ind.key].fg === '#FFFFFF';
+const others = industries.filter((i) => i.key !== ind.key);
+---
+<Base title={ind.name} description={ind.metaDescription} industry={ind.key} showFooterCta={false}>
+  <section class="ind-hero">
+    <div class="container ind-hero-grid">
+      <div class="ind-hero-copy">
+        <nav aria-label="Breadcrumb" class="crumbs">
+          <a href="/#industries">Industries</a> <span aria-hidden="true">/</span> <span aria-current="page">{ind.name}</span>
+        </nav>
+        <h1 class="display ind-h1">{ind.h1}</h1>
+        <p class="ind-sub">{ind.sub}</p>
+        <div class="btn-row">
+          <a class:list={['btn', lightText ? 'btn--light' : 'btn--dark']} href={`/demo?industry=${ind.slug}`}>{ind.ctaButton}</a>
+          <a class="btn btn--outline" href="#features">See what’s included</a>
+        </div>
+      </div>
+      <div class="ind-hero-demo">
+        <ReceiptPrinter industries={[ind.key]} picker={false} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section container problems">
+    <h2 class="display display-lg">{ind.problemsTitle}</h2>
+    <ul class="rule-list">
+      {ind.problems.map((p) => <li><strong>{p.strong}</strong>{p.rest}</li>)}
+    </ul>
+  </section>
+
+  <section id="features" class="bg-paper section">
+    <div class="container">
+      <h2 class="display display-lg feat-title">What’s included</h2>
+      <div class="features">
+        {ind.features.map((f) => (
+          <article id={f.id} class="feature">
+            <span class="feat-tag">{f.tag}</span>
+            <h3>{f.title}</h3>
+            <p>{f.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-dark section">
+    <div class="container">
+      <h2 class="display display-lg">{ind.dayTitle}</h2>
+      <ol class="day">
+        {ind.day.map((d) => (
+          <li><span class="day-when">{d.when}</span><p>{d.text}</p></li>
+        ))}
+      </ol>
+      <div class="works">
+        <span>Works with</span>
+        <ul role="list" class="chip-row">{ind.worksWith.map((w) => <li class="chip">{w}</li>)}</ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section container quote">
+    <blockquote>
+      <p class="display">“[Quote from a customer about what changed after going live.]”</p>
+      <footer class="small">{ind.quoteFrom}</footer>
+    </blockquote>
+  </section>
+
+  <section class="container faq-wrap">
+    <h2 class="display display-md">{ind.faqTitle}</h2>
+    <div class="faq">
+      {ind.faq.map((f) => (
+        <details>
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="ind-cta">
+      <h2 class="display display-lg">{ind.ctaTitle}</h2>
+      <div class="btn-row">
+        <a class:list={['btn', lightText ? 'btn--light' : 'btn--dark']} href={`/demo?industry=${ind.slug}`}>{ind.ctaButton}</a>
+        <a class="btn btn--outline" href="/contact">Ask a question</a>
+      </div>
+    </div>
+    <nav class="other-inds" aria-label="Other industries">
+      <span class="small">Other industries</span>
+      <ul role="list">
+        {others.map((o) => (
+          <li><a href={`/industries/${o.slug}`}><span class="sw" aria-hidden="true" style={`background:${industryTheme[o.key].bg}`}></span>{o.name}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </section>
+</Base>
+
+<style>
+  .ind-hero { background: var(--accent); color: var(--accent-fg); }
+  .ind-hero-grid {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr); gap: 48px 56px; align-items: start;
+    padding-block: 56px 88px;
+  }
+  .ind-hero-copy { display: flex; flex-direction: column; gap: 26px; padding-top: 12px; }
+  .ind-hero .btn--outline { color: var(--accent-fg); }
+  .ind-h1 { font-size: clamp(48px, 6vw, 88px); }
+  .crumbs { font-size: 15px; font-weight: 600; }
+  .crumbs a { color: var(--accent-fg); }
+  .ind-sub { font-size: clamp(18px, 1.6vw, 21px); line-height: 1.5; max-width: 560px; }
+  .ind-hero :global(.rp-note) { box-shadow: 0 0 0 2px var(--accent); }
+  .ind-hero :global(.rp-caption) { color: var(--accent-fg); opacity: 0.85; }
+  .ind-hero :global(.rp-stage) { min-height: 520px; }
+  @media (max-width: 1023px) { .ind-hero-grid { grid-template-columns: minmax(0, 1fr); } }
+
+  .problems { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 32px 56px; align-items: start; }
+  .problems li { font-size: 18px; }
+  @media (max-width: 860px) { .problems { grid-template-columns: minmax(0, 1fr); } }
+
+  .feat-title { margin-bottom: 40px; }
+  .features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
+  .feature { border-top: 3px solid var(--accent); padding-top: 18px; display: flex; flex-direction: column; gap: 8px; scroll-margin-top: 110px; }
+  .feat-tag { font-size: 15px; font-weight: 700; color: var(--accent-text); }
+  .feature h3 { font-size: 22px; line-height: 1.2; }
+  .feature p { color: var(--ink-2); }
+  .feature:target { background: var(--concrete); outline: 8px solid var(--concrete); }
+  @media (max-width: 960px) { .features { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .features { grid-template-columns: minmax(0, 1fr); } }
+
+  .day { list-style: none; padding: 0; margin-top: 40px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+  .day li { border-top: 3px solid var(--accent-soft); padding-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .day-when { font-weight: 700; color: var(--accent-soft); }
+  .day p { color: #d6dade; }
+  @media (max-width: 960px) { .day { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .day { grid-template-columns: minmax(0, 1fr); } }
+  .works { margin-top: 48px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+  .works > span { color: #aeb6bd; }
+
+  .quote blockquote { margin: 0; display: flex; flex-direction: column; gap: 18px; }
+  .quote p { font-size: clamp(28px, 3.2vw, 42px); line-height: 1.12; font-stretch: 80%; max-width: 960px; }
+
+  .faq-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 32px 48px; padding-bottom: 96px; }
+  .faq details { border-bottom: 1px solid var(--line); }
+  .faq details:first-child { border-top: 2px solid var(--graphite); }
+  .faq summary {
+    list-style: none; cursor: pointer; padding: 20px 40px 20px 0; position: relative;
+    font-size: 18px; font-weight: 700; min-height: 48px;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; position: absolute; right: 4px; top: 14px; font-size: 28px; font-weight: 400; }
+  .faq details[open] summary::after { content: '–'; }
+  .faq details p { padding-bottom: 20px; color: var(--ink-2); max-width: 680px; }
+  @media (max-width: 860px) { .faq-wrap { grid-template-columns: minmax(0, 1fr); } }
+
+  .ind-cta {
+    background: var(--accent); color: var(--accent-fg); border-radius: 24px; padding: clamp(36px, 5vw, 64px);
+    display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-end; justify-content: space-between;
+  }
+  .ind-cta h2 { flex: 1 1 480px; }
+  .ind-cta .btn--outline { color: var(--accent-fg); }
+  .other-inds { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding-block: 32px 80px; }
+  .other-inds ul { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+  .other-inds a { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; padding: 8px 0; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; }
+</style>

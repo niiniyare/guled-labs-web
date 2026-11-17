@@ -1,0 +1,172 @@
+---
+import { site, footerColumns, legalLinks, industryTheme } from '../config/site';
+
+interface Props { showCta?: boolean }
+const { showCta = true } = Astro.props;
+const c = site.contacts;
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  {showCta && (
+    <div class="bg-signal">
+      <div class="container footer-cta">
+        <h2 class="display display-xl">See it run on a business like yours</h2>
+        <div class="btn-row">
+          <a class="btn btn--dark" href="/demo">Book a demo</a>
+          <a class="btn btn--outline" href={c.whatsappHref}>Message us on WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <div class="container footer-body">
+    <ul role="list" class="contact-cards">
+      <li>
+        <a href="/contact">
+          <strong>Sales</strong>
+          <span>New business, pricing and demos.</span>
+          <b>{c.salesPhone} · {c.email}</b>
+        </a>
+      </li>
+      <li>
+        <a href="/help">
+          <strong>Support</strong>
+          <span>For live customers. {c.supportHours}</span>
+          <b>{c.supportPhone}</b>
+        </a>
+      </li>
+      <li>
+        <a href={c.whatsappHref}>
+          <strong>WhatsApp</strong>
+          <span>Quick questions, any time.</span>
+          <b>{c.whatsapp}</b>
+        </a>
+      </li>
+      <li>
+        <a href="/contact#visit">
+          <strong>Visit us</strong>
+          <span>{site.address}</span>
+          <b>{site.city}, {site.country}</b>
+        </a>
+      </li>
+    </ul>
+
+    <nav class="footer-nav" aria-label="Footer">
+      <div class="footer-about">
+        <span class="display footer-brand">{site.brand}</span>
+        <p>Business software for fuel stations, shops, restaurants and pharmacies, connected to KRA eTIMS, M-Pesa and your bank.</p>
+      </div>
+      {footerColumns.map((col) => (
+        <div class="footer-col">
+          <h3>{col.title}</h3>
+          <ul role="list">
+            {col.links.map((l) => (
+              <li>
+                <a href={l.href}>
+                  {'industry' in l && l.industry && (
+                    <span class="sw" aria-hidden="true" style={`background:${industryTheme[l.industry].bg}`}></span>
+                  )}
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </nav>
+
+    <div class="newsletter">
+      <div>
+        <h3>Tax and payment changes, explained</h3>
+        <p>One short email when KRA, EPRA or M-Pesa change something that affects your tills.</p>
+      </div>
+      <form class="nl-form" data-newsletter action={site.formEndpoint || undefined} method="post">
+        <div class="field">
+          <label for="footer-email">Work email</label>
+          <input id="footer-email" name="email" type="email" autocomplete="email" required placeholder="you@business.co.ke" />
+        </div>
+        <input type="hidden" name="form" value="newsletter" />
+        <button type="submit" class="btn btn--signal">Subscribe</button>
+        <p class="nl-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div class="legal">
+      <div class="legal-links">
+        <span>© {year} {site.legalName}</span>
+        {legalLinks.map((l) => <a href={l.href}>{l.label}</a>)}
+      </div>
+      <div class="legal-links">
+        {site.social.map((s) => <a href={s.href}>{s.label}</a>)}
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: var(--graphite); color: #fff; }
+  .footer-cta {
+    display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-end; justify-content: space-between;
+    padding-block: clamp(64px, 8vw, 88px);
+  }
+  .footer-cta h2 { flex: 1 1 520px; }
+  .footer-body { padding-block: 64px 0; display: flex; flex-direction: column; gap: 56px; }
+
+  .contact-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .contact-cards a {
+    height: 100%; display: flex; flex-direction: column; gap: 6px; padding: 22px;
+    border: 1px solid var(--line-dark); border-radius: 12px; text-decoration: none; color: #fff;
+  }
+  .contact-cards a:hover { border-color: #fff; color: #fff; }
+  .contact-cards strong { font-size: 18px; }
+  .contact-cards span { font-size: 15px; color: var(--on-dark-muted); }
+  .contact-cards b { font-size: 16px; padding-top: 6px; }
+
+  .footer-nav { display: flex; flex-wrap: wrap; gap: 40px 32px; }
+  .footer-about { flex: 2 1 260px; display: flex; flex-direction: column; gap: 14px; }
+  .footer-brand { font-size: 36px; }
+  .footer-about p { font-size: 15px; line-height: 1.6; color: var(--on-dark-muted); max-width: 300px; }
+  .footer-col { flex: 1 1 150px; }
+  .footer-col h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .footer-col a {
+    display: flex; align-items: center; gap: 8px; padding: 6px 0;
+    color: var(--on-dark-muted); text-decoration: none; font-size: 15px;
+  }
+  .footer-col a:hover { color: #fff; text-decoration: underline; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  .newsletter {
+    display: flex; flex-wrap: wrap; gap: 20px 40px; align-items: flex-end; justify-content: space-between;
+    padding-block: 28px; border-block: 1px solid #3a434b;
+  }
+  .newsletter > div { flex: 1 1 340px; }
+  .newsletter h3 { font-size: 20px; margin-bottom: 6px; }
+  .newsletter p { font-size: 15px; color: var(--on-dark-muted); }
+  .nl-form { flex: 1 1 420px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+  .field { flex: 1 1 240px; display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 14px; color: var(--on-dark-muted); }
+  .field input {
+    min-height: 52px; padding: 0 14px; border-radius: var(--radius);
+    border: 1px solid var(--slate); background: var(--graphite-2); color: #fff; font-size: 16px;
+  }
+  .nl-status { flex-basis: 100%; font-size: 14px; color: var(--on-dark-muted); min-height: 1em; }
+
+  .legal {
+    display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; align-items: center;
+    padding-bottom: 36px; font-size: 14px; color: var(--on-dark-muted);
+  }
+  .legal-links { display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; }
+  .legal a { color: var(--on-dark-muted); }
+  .legal a:hover { color: #fff; }
+</style>
+
+<script>
+  import { submitForm } from '../scripts/forms';
+  document.querySelectorAll<HTMLFormElement>('[data-newsletter]').forEach((form) => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const status = form.querySelector<HTMLElement>('.nl-status')!;
+      submitForm(form, status, 'Thanks — you’re on the list.');
+    });
+  });
+</script>

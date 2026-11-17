@@ -1,0 +1,85 @@
+---
+// Static mock of the owner's end-of-day screen. Sample data only.
+const bars = [20, 55, 92, 70, 48, 52, 61, 44, 50, 66, 100, 74, 38];
+const peak = new Set([2, 10]);
+---
+<figure class="dash" aria-label="Sample of the owner overview screen">
+  <div class="dash-top">
+    <div class="dash-title"><span class="dash-mark" aria-hidden="true"></span><strong>Overview</strong><span class="small">Today</span></div>
+    <div class="dash-pills"><span class="pill">All branches</span><span class="pill pill--muted">Sample data</span></div>
+  </div>
+  <div class="dash-body">
+    <ul role="list" class="dash-side">
+      <li class="is-on">Overview</li><li>Sales</li><li>Stock &amp; tanks</li><li>eTIMS</li><li>Payments</li><li>People</li><li>Accounts</li>
+    </ul>
+    <div class="dash-main">
+      <dl class="kpis">
+        <div><dt>Sales</dt><dd>KES 1.28M</dd><dd class="ok">+6% on last Tuesday</dd></div>
+        <div><dt>Signed by eTIMS</dt><dd>1,912 / 1,912</dd><dd class="ok">Nothing waiting</dd></div>
+        <div><dt>M-Pesa to match</dt><dd>3</dd><dd class="warn">Needs a look</dd></div>
+        <div><dt>Low stock</dt><dd>11 items</dd><dd class="dim">2 orders drafted</dd></div>
+      </dl>
+      <div class="dash-lower">
+        <div class="chart">
+          <span class="chart-title">Sales by hour</span>
+          <div class="bars" role="img" aria-label="Bar chart of sample sales by hour, with peaks around 8am and 6pm">
+            {bars.map((h, i) => <span style={`height:${h}%`} class:list={{ peak: peak.has(i) }}></span>)}
+          </div>
+          <div class="axis small"><span>6am</span><span>12pm</span><span>6pm</span></div>
+        </div>
+        <div class="branches">
+          <span class="chart-title">Branches</span>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">Branch</th><th scope="col">Sales</th><th scope="col">Status</th></tr></thead>
+              <tbody>
+                <tr><td>Highway station</td><td>KES 642,100</td><td class="ok">Balanced</td></tr>
+                <tr><td>Town supermarket</td><td>KES 418,750</td><td class="warn">3 M-Pesa to match</td></tr>
+                <tr><td>Station café</td><td>KES 223,450</td><td class="ok">Balanced</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .dash { background: #fff; border: 2px solid var(--graphite); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 10px 10px 0 var(--graphite); }
+  .dash-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .dash-title { display: flex; align-items: center; gap: 14px; }
+  .dash-mark { width: 22px; height: 26px; background: var(--graphite); border-radius: 3px 3px 0 0; }
+  .dash-pills { display: flex; gap: 8px; font-size: 14px; }
+  .pill { padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; }
+  .pill--muted { background: var(--concrete); border-color: transparent; color: var(--ink-2); }
+  .dash-body { display: flex; flex-wrap: wrap; }
+  .dash-side { flex: 1 1 180px; padding: 20px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+  .dash-side li { padding: 10px 12px; border-radius: 8px; }
+  .dash-side .is-on { background: var(--graphite); color: #fff; font-weight: 600; }
+  .dash-main { flex: 999 1 560px; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .kpis > div { padding: 16px; border: 1px solid var(--line); border-radius: var(--radius); display: flex; flex-direction: column; gap: 6px; }
+  .kpis dt { font-size: 14px; color: var(--slate); }
+  .kpis dd:nth-of-type(1) { font-weight: 800; font-stretch: 80%; font-size: 30px; line-height: 1.1; }
+  .kpis dd + dd { font-size: 13px; font-weight: 600; }
+  .ok { color: var(--ok); font-weight: 600; }
+  .warn { color: var(--warn); font-weight: 600; }
+  .dim { color: var(--slate); }
+  .dash-lower { display: flex; flex-wrap: wrap; gap: 24px; }
+  .chart, .branches { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .chart-title { font-size: 15px; font-weight: 700; }
+  .bars { height: 160px; display: flex; align-items: flex-end; gap: 6px; border-bottom: 1px solid var(--line); }
+  .bars span { flex: 1; background: #a9b0aa; border-radius: 3px 3px 0 0; }
+  .bars span.peak { background: var(--graphite); }
+  .axis { display: flex; justify-content: space-between; font-size: 12px; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; min-width: 340px; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-weight: 600; color: var(--slate); padding: 8px 8px 8px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 10px 8px 10px 0; border-bottom: 1px solid var(--concrete); }
+  @media (max-width: 760px) {
+    .dash-side { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--line); padding: 12px; }
+    .dash-side li:not(.is-on) { display: none; }
+    .dash { box-shadow: 6px 6px 0 var(--graphite); }
+  }
+</style>

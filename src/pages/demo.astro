@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { site } from '../config/site';
+---
+<Base title="Book a demo" showFooterCta={false} description={`See ${site.brand} running on a business like yours. 30 minutes, tailored to your trade.`}>
+  <section class="container demo">
+    <div class="demo-intro">
+      <h1 class="display display-xl">Book a demo</h1>
+      <p class="lead">30 minutes, on a business like yours. We’ll show the screens your staff would use and answer questions about eTIMS, M-Pesa and your hardware.</p>
+      <ol class="steps">
+        <li><strong>You send this form.</strong> It takes a minute.</li>
+        <li><strong>We call or WhatsApp you</strong> within one working day to pick a time.</li>
+        <li><strong>We show it working</strong> — online, or at your site in [City].</li>
+      </ol>
+    </div>
+    <div class="demo-form">
+      <ContactForm topic="demo" submitLabel="Request my demo" />
+    </div>
+  </section>
+</Base>
+<style>
+  .demo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 48px 64px; padding-block: 64px 104px; }
+  .demo-intro { display: flex; flex-direction: column; gap: 24px; }
+  .steps { padding-left: 1.2em; display: flex; flex-direction: column; gap: 12px; font-size: 17px; }
+  .demo-form { background: #fff; border-radius: var(--radius-lg); padding: clamp(24px, 4vw, 40px); }
+  @media (max-width: 960px) { .demo { grid-template-columns: minmax(0, 1fr); } }
+</style>
